@@ -1,49 +1,150 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <title>Controle de Fichas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Fichas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: 24px auto; padding: 0 16px; }
-    h1 { margin-bottom: 8px; }
-    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin: 12px 0; }
-    ul { padding-left: 18px; }
-    li { margin: 4px 0; }
-    .muted { color: #555; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.8em;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #34495e;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table th, table td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    table th {
+      background-color: #2980b9;
+      color: white;
+    }
+
+    .total {
+      font-size: 2.2em;
+      font-weight: bold;
+      color: #27ae60;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      color: #888;
+      font-size: 0.9em;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: 400px;
+    }
   </style>
 </head>
 <body>
-  <h1>🎮 Controle de Fichas</h1>
-  <div class="card">
-    <h2>Total de fichas</h2>
-    <p style="font-size: 22px;"><b>{{ total }}</b></p>
-  </div>
+  <header>
+    Dashboard de Controle de Fichas
+  </header>
+  <main>
+    <div class="card total">
+      Total de Fichas: {{ total }}
+    </div>
 
-  <div class="card">
-    <h2>Últimos registros</h2>
-    {% if ultimas %}
-      <ul>
-        {% for item in ultimas %}
-          <li><span class="muted">{{ item.data_hora }}</span> — {{ item.quantidade }} ficha(s)</li>
+    <div class="card">
+      <h2>Últimos Registros</h2>
+      <table>
+        <tr>
+          <th>Data/Hora</th>
+          <th>Quantidade</th>
+        </tr>
+        {% for r in ultimas %}
+        <tr>
+          <td>{{ r.data_hora }}</td>
+          <td>{{ r.quantidade }}</td>
+        </tr>
         {% endfor %}
-      </ul>
-    {% else %}
-      <p class="muted">Ainda não há registros.</p>
-    {% endif %}
-  </div>
+      </table>
+    </div>
 
-  <div class="card">
-    <h2>Resumo por dia</h2>
-    {% if resumo %}
-      <ul>
-        {% for item in resumo %}
-          <li>{{ item.dia }} → {{ item.total }} ficha(s)</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="muted">Sem dados agregados ainda.</p>
-    {% endif %}
-  </div>
+    <div class="card">
+      <h2>Resumo Diário</h2>
+      <canvas id="resumoChart"></canvas>
+    </div>
+  </main>
+  <footer>
+    Sistema de Controle de Fichas - {{ datetime.now().year }}
+  </footer>
+
+  <script>
+    const ctx = document.getElementById('resumoChart').getContext('2d');
+    const resumoData = {
+      labels: {{ resumo | map(attribute='dia') | list | tojson }},
+      datasets: [{
+        label: 'Fichas por dia',
+        data: {{ resumo | map(attribute='total') | list | tojson }},
+        backgroundColor: 'rgba(41, 128, 185, 0.5)',
+        borderColor: 'rgba(41, 128, 185, 1)',
+        borderWidth: 1
+      }]
+    };
+
+    const resumoChart = new Chart(ctx, {
+      type: 'bar',
+      data: resumoData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Evolução diária de fichas'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            stepSize: 1
+          }
+        }
+      }
+    });
+  </script>
 </body>
 </html>
+
