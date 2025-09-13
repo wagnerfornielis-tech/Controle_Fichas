@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle de Fichas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 24px auto; padding: 0 16px; }
+    h1 { margin-bottom: 8px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin: 12px 0; }
+    ul { padding-left: 18px; }
+    li { margin: 4px 0; }
+    .muted { color: #555; }
+  </style>
+</head>
+<body>
+  <h1>🎮 Controle de Fichas</h1>
+  <div class="card">
+    <h2>Total de fichas</h2>
+    <p style="font-size: 22px;"><b>{{ total }}</b></p>
+  </div>
+
+  <div class="card">
+    <h2>Últimos registros</h2>
+    {% if ultimas %}
+      <ul>
+        {% for item in ultimas %}
+          <li><span class="muted">{{ item.data_hora }}</span> — {{ item.quantidade }} ficha(s)</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">Ainda não há registros.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Resumo por dia</h2>
+    {% if resumo %}
+      <ul>
+        {% for item in resumo %}
+          <li>{{ item.dia }} → {{ item.total }} ficha(s)</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">Sem dados agregados ainda.</p>
+    {% endif %}
+  </div>
+</body>
+</html>
