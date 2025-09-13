@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard de Fichas</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Controle de Fichas</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,7 +22,7 @@
 
     main {
       padding: 20px;
-      max-width: 1200px;
+      max-width: 1000px;
       margin: auto;
     }
 
@@ -70,16 +69,11 @@
       color: #888;
       font-size: 0.9em;
     }
-
-    canvas {
-      max-width: 100%;
-      height: 400px;
-    }
   </style>
 </head>
 <body>
   <header>
-    Dashboard de Controle de Fichas
+    Controle de Fichas - Máquina
   </header>
   <main>
     <div class="card total">
@@ -104,47 +98,76 @@
 
     <div class="card">
       <h2>Resumo Diário</h2>
-      <canvas id="resumoChart"></canvas>
+      <table>
+        <tr>
+          <th>Dia</th>
+          <th>Total</th>
+        </tr>
+        {% for r in resumo %}
+        <tr>
+          <td>{{ r.dia }}</td>
+          <td>{{ r.total }}</td>
+        </tr>
+        {% endfor %}
+      </table>
     </div>
   </main>
   <footer>
     Sistema de Controle de Fichas - {{ datetime.now().year }}
   </footer>
-
-  <script>
-    const ctx = document.getElementById('resumoChart').getContext('2d');
-    const resumoData = {
-      labels: {{ resumo | map(attribute='dia') | list | tojson }},
-      datasets: [{
-        label: 'Fichas por dia',
-        data: {{ resumo | map(attribute='total') | list | tojson }},
-        backgroundColor: 'rgba(41, 128, 185, 0.5)',
-        borderColor: 'rgba(41, 128, 185, 1)',
-        borderWidth: 1
-      }]
-    };
-
-    const resumoChart = new Chart(ctx, {
-      type: 'bar',
-      data: resumoData,
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          title: {
-            display: true,
-            text: 'Evolução diária de fichas'
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            stepSize: 1
-          }
-        }
-      }
-    });
-  </script>
 </body>
 </html>
+
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle de Fichas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 24px auto; padding: 0 16px; }
+    h1 { margin-bottom: 8px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; margin: 12px 0; }
+    ul { padding-left: 18px; }
+    li { margin: 4px 0; }
+    .muted { color: #555; }
+  </style>
+</head>
+<body>
+  <h1>🎮 GE Pelúcias</h1>
+  <div class="card">
+    <h2>Total de fichas</h2>
+    <p style="font-size: 22px;"><b>{{ total }}</b></p>
+  </div>
+
+  <div class="card">
+    <h2>Últimos registros</h2>
+    {% if ultimas %}
+      <ul>
+        {% for item in ultimas %}
+          <li><span class="muted">{{ item.data_hora }}</span> — {{ item.quantidade }} ficha(s)</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">Ainda não há registros.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Resumo por dia</h2>
+    {% if resumo %}
+      <ul>
+        {% for item in resumo %}
+          <li>{{ item.dia }} → {{ item.total }} ficha(s)</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">Sem dados agregados ainda.</p>
+    {% endif %}
+  </div>
+</body>
+</html>
+
 
